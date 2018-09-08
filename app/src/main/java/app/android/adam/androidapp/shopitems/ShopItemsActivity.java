@@ -10,7 +10,6 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import app.android.adam.androidapp.AuthenticatedActivity;
@@ -71,22 +70,19 @@ public class ShopItemsActivity extends AuthenticatedActivity {
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
+            ShopItem shopItem = shopItems.get(position);
             if (convertView == null) {
                 LayoutInflater layoutInflater = getLayoutInflater();
                 convertView = layoutInflater.inflate(R.layout.shopitem, null);
                 TextView textView = convertView.findViewById(R.id.shopItemText);
-                final ToggleButton toggleButton = convertView.findViewById(R.id.shopItemBought);
+                ToggleButton toggleButton = convertView.findViewById(R.id.shopItemBought);
+
                 ViewHolder viewHolder = new ViewHolder(toggleButton, textView);
+
                 convertView.setTag(viewHolder);
             }
-            final ShopItem shopItem = shopItems.get(position);
             ViewHolder viewHolder = (ViewHolder) convertView.getTag();
-            viewHolder.shopItemBought.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    shopItem.setBought(!shopItem.isBought());
-                }
-            });
+            viewHolder.shopItemBought.setOnClickListener(new ToggleBoughtListener(shopItem));
             viewHolder.shopItemBought.setChecked(shopItem.isBought());
             viewHolder.shopItemName.setText(shopItem.getName());
             return convertView;
@@ -99,6 +95,19 @@ public class ShopItemsActivity extends AuthenticatedActivity {
             ViewHolder(ToggleButton shopItemBought, TextView shopItemName) {
                 this.shopItemBought = shopItemBought;
                 this.shopItemName = shopItemName;
+            }
+        }
+        private class ToggleBoughtListener implements View.OnClickListener {
+
+            final ShopItem shopItem;
+
+            private ToggleBoughtListener(ShopItem shopItem) {
+                this.shopItem = shopItem;
+            }
+
+            @Override
+            public void onClick(View v) {
+                shopItem.setBought(!shopItem.isBought());
             }
         }
     }
