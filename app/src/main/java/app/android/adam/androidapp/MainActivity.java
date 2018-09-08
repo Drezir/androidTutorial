@@ -2,13 +2,21 @@ package app.android.adam.androidapp;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import app.android.adam.androidapp.shopitems.ShopItemsActivity;
 import app.android.adam.androidapp.user.User;
 
 public class MainActivity extends AuthenticatedActivity {
@@ -17,6 +25,15 @@ public class MainActivity extends AuthenticatedActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        findViewById(R.id.mainToastButton).setOnClickListener(new ButtonToastListener());
+        findViewById(R.id.mainListButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ShopItemsActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -52,5 +69,20 @@ public class MainActivity extends AuthenticatedActivity {
             }
         }
         return false;
+    }
+
+    private class ButtonToastListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            LayoutInflater layoutInflater = getLayoutInflater();
+            View toastView = layoutInflater.inflate(R.layout.mytoastview, null);
+            ((TextView)toastView.findViewById(R.id.toastTextView)).setText("It is locked !!!");
+            Toast toast = new Toast(getApplicationContext());
+            toast.setView(toastView);
+            toast.setDuration(Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
     }
 }
