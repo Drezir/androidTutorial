@@ -82,6 +82,8 @@ public class ShopItemsActivity extends AuthenticatedActivity {
                 convertView.setTag(viewHolder);
             }
             ViewHolder viewHolder = (ViewHolder) convertView.getTag();
+            // click listener must be set always no matter of convertView is or is not null
+            // otherwise recycle view behaves strangely to checked states of toggle buttons
             viewHolder.shopItemBought.setOnClickListener(new ToggleBoughtListener(shopItem));
             viewHolder.shopItemBought.setChecked(shopItem.isBought());
             viewHolder.shopItemName.setText(shopItem.getName());

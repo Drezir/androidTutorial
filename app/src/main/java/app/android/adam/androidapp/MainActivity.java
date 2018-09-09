@@ -1,21 +1,23 @@
 package app.android.adam.androidapp;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import app.android.adam.androidapp.interfaces.FragmentDataExtractor;
 import app.android.adam.androidapp.shopitems.ShopItemsActivity;
 import app.android.adam.androidapp.user.User;
 
@@ -34,6 +36,8 @@ public class MainActivity extends AuthenticatedActivity {
                 startActivity(intent);
             }
         });
+        findViewById(R.id.mainPopupButton).setOnClickListener(new ButtonShowPopup());
+        findViewById(R.id.mainAlertButton).setOnClickListener(new ButtonShowAlert());
     }
 
     @Override
@@ -83,6 +87,43 @@ public class MainActivity extends AuthenticatedActivity {
             toast.setDuration(Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
+        }
+    }
+    private class ButtonShowPopup implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Popup popup = new Popup();
+            popup.setDataExtractor(new FragmentDataExtractor<String>() {
+                @Override
+                public void provideData(String data) {
+                    Toast.makeText(MainActivity.this, data, Toast.LENGTH_SHORT).show();
+                }
+            });
+            popup.show(fragmentManager, "Show fragment");
+        }
+    }
+    private class ButtonShowAlert implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+            alert.setMessage("UFO just above you");
+            alert.setTitle("UFO !!!!!");
+            alert.setPositiveButton("Kill it", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(MainActivity.this,"You have killed UFO", Toast.LENGTH_SHORT).show();
+                }
+            });
+            alert.setNegativeButton("Do nothing", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(MainActivity.this,"You have been killed", Toast.LENGTH_SHORT).show();
+                }
+            });
+            alert.show();
         }
     }
 }

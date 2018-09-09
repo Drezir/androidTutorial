@@ -23,16 +23,24 @@
             android:id="@+id/mainToastButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Show custom toast"
-            tools:layout_editor_absoluteX="70dp"
-            tools:layout_editor_absoluteY="131dp" />
+            android:text="Show custom toast" />
 
         <Button
             android:id="@+id/mainListButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Show list activity"
-            tools:layout_editor_absoluteX="70dp"
-            tools:layout_editor_absoluteY="131dp" />
+            android:text="Show list activity" />
+
+        <Button
+            android:id="@+id/mainPopupButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show DatePicker popup"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/mainAlertButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show alert dialog"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
