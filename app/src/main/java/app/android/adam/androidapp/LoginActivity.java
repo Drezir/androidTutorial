@@ -1,6 +1,7 @@
 package app.android.adam.androidapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +18,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText username, password;
     private Button loginButton;
 
+    private static final String USERNAME_KEY = "usernameKey";
+    private static SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +31,27 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.loginButton);
 
         loginButton.setOnClickListener(new LoginClickListener());
+
+        loadPreferences();
+        focusPasswordIfUsernameIsSet();
+    }
+
+    private void loadPreferences() {
+        if (sharedPreferences == null) {
+            sharedPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        }
+        String username = sharedPreferences.getString(USERNAME_KEY, "");
+        this.username.setText(username);
+    }
+    private void focusPasswordIfUsernameIsSet() {
+        if (!username.getText().toString().isEmpty()) {
+            this.password.requestFocus();
+        }
+    }
+    private void savePreferences() {
+        SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putString(USERNAME_KEY, username.getText().toString());
+        sharedPreferencesEditor.commit();
     }
 
     @Override
@@ -51,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
                     username.getText().toString(),
                     password.getText().toString());
             if (User.INSTANCE.login(credentials)) {
+                savePreferences();
                 redirectToMain();
             } else {
                 Animation animation = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.shake);

@@ -4,17 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".shopitems.ShopItemsActivity">
+    tools:context=".shopitems.ShopItemsActivity"
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/shopitemsListView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/shopItemsButtonsGroup"/>
+
+    <LinearLayout
+        android:id="@+id/shopItemsButtonsGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/shopitemsListView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/shopItemsSaveData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Init data" />
+
+        <Button
+            android:id="@+id/shopItemsDeleteData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Clear data" />
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

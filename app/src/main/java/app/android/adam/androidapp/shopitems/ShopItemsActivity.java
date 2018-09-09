@@ -9,47 +9,37 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import app.android.adam.androidapp.AuthenticatedActivity;
 import app.android.adam.androidapp.R;
+import app.android.adam.androidapp.database.Repository;
 
 public class ShopItemsActivity extends AuthenticatedActivity {
+
+    private Repository repository;
+    private ShopItemListAdapter shopItemListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop_items);
 
-        List<ShopItem> shopItems = new ArrayList<ShopItem>(5);
-        shopItems.add(new ShopItem("Bananas", false));
-        shopItems.add(new ShopItem("Oranges", false));
-        shopItems.add(new ShopItem("Peaches", false));
-        shopItems.add(new ShopItem("Carrots", false));
-        shopItems.add(new ShopItem("Cucumbers", false));
-        shopItems.add(new ShopItem("Melons", false));
-        shopItems.add(new ShopItem("Lemons", false));
-        shopItems.add(new ShopItem("Tomatoes", false));
-        shopItems.add(new ShopItem("Potatoes", false));
-        shopItems.add(new ShopItem("Onions", false));
-        shopItems.add(new ShopItem("Garlics", false));
-        shopItems.add(new ShopItem("Salad", false));
-        shopItems.add(new ShopItem("Apples", false));
-        shopItems.add(new ShopItem("Cherries", false));
-        shopItems.add(new ShopItem("Blueberries", false));
-        shopItems.add(new ShopItem("Pears", false));
-        shopItems.add(new ShopItem("Raspberries", false));
+        repository = new Repository(this);
+        List<ShopItem> shopItems = repository.getAllItems();
 
+        findViewById(R.id.shopItemsSaveData).setOnClickListener(new ButtonSaveDataListener(shopItems));
+        findViewById(R.id.shopItemsDeleteData).setOnClickListener(new ButtonClearDataListener(shopItems));
 
-        ((ListView)findViewById(R.id.shopitemsListView)).setAdapter(new ShopItemListAdapter(shopItems));
+        shopItemListAdapter = new ShopItemListAdapter(shopItems);
+        ((ListView)findViewById(R.id.shopitemsListView)).setAdapter(shopItemListAdapter);
     }
 
     private class ShopItemListAdapter extends BaseAdapter {
 
         private List<ShopItem> shopItems;
 
-        public ShopItemListAdapter(List<ShopItem> shopItems) {
+        private ShopItemListAdapter(List<ShopItem> shopItems) {
             this.shopItems = shopItems;
         }
 
@@ -110,7 +100,57 @@ public class ShopItemsActivity extends AuthenticatedActivity {
             @Override
             public void onClick(View v) {
                 shopItem.setBought(!shopItem.isBought());
+                repository.update(shopItem);
             }
         }
     }
+
+    private class ButtonSaveDataListener implements View.OnClickListener {
+
+        private final List<ShopItem> shopItems;
+
+        private ButtonSaveDataListener(List<ShopItem> shopItems) {
+            this.shopItems = shopItems;
+        }
+
+        @Override
+        public void onClick(View v) {
+            repository.insertData(new ShopItem("Bananas", false));
+            repository.insertData(new ShopItem("Oranges", false));
+            repository.insertData(new ShopItem("Peaches", false));
+            repository.insertData(new ShopItem("Carrots", false));
+            repository.insertData(new ShopItem("Cucumbers", false));
+            repository.insertData(new ShopItem("Melons", false));
+            repository.insertData(new ShopItem("Lemons", false));
+            repository.insertData(new ShopItem("Tomatoes", false));
+            repository.insertData(new ShopItem("Potatoes", false));
+            repository.insertData(new ShopItem("Onions", false));
+            repository.insertData(new ShopItem("Garlics", false));
+            repository.insertData(new ShopItem("Salad", false));
+            repository.insertData(new ShopItem("Apples", false));
+            repository.insertData(new ShopItem("Cherries", false));
+            repository.insertData(new ShopItem("Blueberries", false));
+            repository.insertData(new ShopItem("Pears", false));
+            repository.insertData(new ShopItem("Raspberries", false));
+
+            shopItems.addAll(repository.getAllItems());
+            shopItemListAdapter.notifyDataSetChanged();
+        }
+    }
+    private class ButtonClearDataListener implements View.OnClickListener {
+
+        private final List<ShopItem> shopItems;
+
+        private ButtonClearDataListener(List<ShopItem> shopItems) {
+            this.shopItems = shopItems;
+        }
+
+        @Override
+        public void onClick(View v) {
+            shopItems.forEach(repository::delete);
+            shopItems.clear();
+            shopItemListAdapter.notifyDataSetChanged();
+        }
+    }
+
 }
