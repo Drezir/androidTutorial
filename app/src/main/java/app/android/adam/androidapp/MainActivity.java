@@ -1,11 +1,18 @@
 package app.android.adam.androidapp;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,15 +20,28 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+
+import app.android.adam.androidapp.contact.Contact;
 import app.android.adam.androidapp.interfaces.FragmentDataExtractor;
 import app.android.adam.androidapp.shopitems.ShopItemsActivity;
 import app.android.adam.androidapp.user.User;
 
 public class MainActivity extends AuthenticatedActivity {
+
+    private static final int GPS_FINE_LOCATION_REQUEST_CODE = 1;
+
+    private Button topTextGps;
+    private Button mainThreadCounter;
+
+    private boolean counterRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,15 +49,76 @@ public class MainActivity extends AuthenticatedActivity {
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.mainToastButton).setOnClickListener(new ButtonToastListener());
-        findViewById(R.id.mainListButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), ShopItemsActivity.class);
-                startActivity(intent);
-            }
+        findViewById(R.id.mainListButton).setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), ShopItemsActivity.class);
+            startActivity(intent);
         });
         findViewById(R.id.mainPopupButton).setOnClickListener(new ButtonShowPopup());
         findViewById(R.id.mainAlertButton).setOnClickListener(new ButtonShowAlert());
+
+        topTextGps = findViewById(R.id.mainTopTextGps);
+        topTextGps.setOnClickListener(v -> {
+            checkGpsPermissions();
+        });
+        mainThreadCounter = findViewById(R.id.mainThreadCounter);
+        mainThreadCounter.setOnClickListener(v -> {
+            counterRunning = !counterRunning;
+            if (counterRunning) {
+                new Thread(new CounterRunner()).start();
+            }
+        });
+        findViewById(R.id.mainShowContacts).setOnClickListener(v -> {
+            Intent intent = new Intent(this, ContactActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private class CounterRunner implements Runnable {
+
+        private int count = 0;
+
+        @Override
+        public void run() {
+            while(counterRunning) {
+                mainThreadCounter.setText(Integer.toString(count++));
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) { }
+            }
+        }
+    }
+
+    private void setupGps() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        topTextGps.setText(location.getLatitude() + ":" + location.getLongitude());
+    }
+
+    private void checkGpsPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                        GPS_FINE_LOCATION_REQUEST_CODE);
+                return;
+            }
+        }
+        setupGps();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case GPS_FINE_LOCATION_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setupGps();
+                } else {
+                    topTextGps.setText("Permissions denied, tap again");
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override

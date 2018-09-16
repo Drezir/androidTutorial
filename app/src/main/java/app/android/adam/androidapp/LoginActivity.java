@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
     private void savePreferences() {
         SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
         sharedPreferencesEditor.putString(USERNAME_KEY, username.getText().toString());
-        sharedPreferencesEditor.commit();
+        sharedPreferencesEditor.apply();
     }
 
     @Override

@@ -20,6 +20,21 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <Button
+            android:id="@+id/mainTopTextGps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tap me for GPS"
+            android:textSize="20sp"
+            android:textAlignment="center"/>
+
+        <Button
+            android:id="@+id/mainThreadCounter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tap me for counter"
+            android:textSize="20sp"/>
+
+        <Button
             android:id="@+id/mainToastButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,10 +52,16 @@
             android:layout_height="wrap_content"
             android:text="Show DatePicker popup"/>
 
-        <android.support.v7.widget.AppCompatButton
+        <Button
             android:id="@+id/mainAlertButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Show alert dialog"/>
+
+        <Button
+            android:id="@+id/mainShowContacts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show contacts"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
