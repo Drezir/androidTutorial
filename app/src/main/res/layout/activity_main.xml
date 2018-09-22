@@ -31,7 +31,7 @@
             android:id="@+id/mainThreadCounter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tap me for counter"
+            android:text="Tap m9e for counter"
             android:textSize="20sp"/>
 
         <Button
@@ -63,5 +63,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Show contacts"/>
+
+        <Button
+            android:id="@+id/mainShowNotification"
+            android:text="Notification"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

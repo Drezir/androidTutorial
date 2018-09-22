@@ -2,6 +2,7 @@ package app.android.adam.androidapp;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -71,6 +73,7 @@ public class MainActivity extends AuthenticatedActivity {
             Intent intent = new Intent(this, ContactActivity.class);
             startActivity(intent);
         });
+        findViewById(R.id.mainShowNotification).setOnClickListener(new ButtonNotification());
     }
 
     private class CounterRunner implements Runnable {
@@ -205,6 +208,30 @@ public class MainActivity extends AuthenticatedActivity {
                 }
             });
             alert.show();
+        }
+    }
+    private class ButtonNotification implements View.OnClickListener {
+
+        private int notId = 0;
+
+        @Override
+        public void onClick(View v) {
+            /*
+            // HARD WAY
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                    MainActivity.this, String.valueOf(notId));
+            builder.setContentTitle("A notification")
+                    .setContentText("Here is a text of this notification")
+                    .setSmallIcon(R.drawable.ic_search_black_24dp);
+
+            NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.notify(notId, builder.build());
+            }*/
+
+            // EASY WAY
+            CustomNotification customNotification = new CustomNotification();
+            customNotification.notify(MainActivity.this, "It is raining", notId);
         }
     }
 }
