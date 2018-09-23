@@ -31,7 +31,7 @@
             android:id="@+id/mainThreadCounter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tap m9e for counter"
+            android:text="Tap me for counter"
             android:textSize="20sp"/>
 
         <Button
@@ -69,5 +69,23 @@
             android:text="Notification"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/mainSendBroadcast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Send broadcast"/>
+
+        <Button
+            android:id="@+id/mainToggleService"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Toggle service"/>
+
+        <Button
+            android:id="@+id/mainServiceData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get data from service"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

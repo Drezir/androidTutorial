@@ -4,14 +4,20 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.SearchManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -31,19 +37,48 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import app.android.adam.androidapp.broadcast.MyReceiver;
 import app.android.adam.androidapp.contact.Contact;
 import app.android.adam.androidapp.interfaces.FragmentDataExtractor;
+import app.android.adam.androidapp.services.MyJobService;
+import app.android.adam.androidapp.services.MyService;
+import app.android.adam.androidapp.services.ServiceUi;
 import app.android.adam.androidapp.shopitems.ShopItemsActivity;
 import app.android.adam.androidapp.user.User;
 
 public class MainActivity extends AuthenticatedActivity {
 
     private static final int GPS_FINE_LOCATION_REQUEST_CODE = 1;
+    private static final int RECEIVE_SMS_REQUEST_CODE = 1;
 
     private Button topTextGps;
     private Button mainThreadCounter;
 
     private boolean counterRunning;
+
+    private Intent intentService;
+
+    private ServiceUi serviceUi;
+    private boolean mBound;
+    private ServiceConnection mConnection;
+
+    private int jobId = 0;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, ServiceUi.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +92,10 @@ public class MainActivity extends AuthenticatedActivity {
         });
         findViewById(R.id.mainPopupButton).setOnClickListener(new ButtonShowPopup());
         findViewById(R.id.mainAlertButton).setOnClickListener(new ButtonShowAlert());
+        findViewById(R.id.mainShowNotification).setOnClickListener(new ButtonNotification());
+        findViewById(R.id.mainSendBroadcast).setOnClickListener(new ButtonBroadcast());
+        findViewById(R.id.mainToggleService).setOnClickListener(new ButtonService());
+        findViewById(R.id.mainServiceData).setOnClickListener(new ButtonServiceData());
 
         topTextGps = findViewById(R.id.mainTopTextGps);
         topTextGps.setOnClickListener(v -> {
@@ -73,7 +112,52 @@ public class MainActivity extends AuthenticatedActivity {
             Intent intent = new Intent(this, ContactActivity.class);
             startActivity(intent);
         });
-        findViewById(R.id.mainShowNotification).setOnClickListener(new ButtonNotification());
+
+        checkReadSmsPermissions();
+        setupBroadcast();
+        jobService();
+
+        mConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                ServiceUi.ServiceUiBinder binder = (ServiceUi.ServiceUiBinder)service;
+                serviceUi = binder.getService();
+                mBound = true;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                mBound = false;
+            }
+        };
+    }
+
+    private void jobService() {
+
+        JobInfo.Builder builder = new JobInfo.Builder(jobId, new ComponentName(this, MyJobService.class));
+        builder.setPeriodic(2000);
+        builder.setPersisted(true);
+        builder.setRequiresDeviceIdle(true);
+        builder.setRequiresCharging(true);
+        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+        JobScheduler jobScheduler = (JobScheduler)getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.schedule(builder.build());
+    }
+    private void setupBroadcast() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("MyAction");
+        intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
+        intentFilter.addCategory("android.intent.category.DEFAULT");
+        registerReceiver(new MyReceiver(), intentFilter);
+    }
+    private void service() {
+        if (MyService.RUNNING) {
+            stopService(intentService);
+        } else {
+            intentService = new Intent(this, MyService.class);
+            startService(intentService);
+        }
+        MyService.RUNNING = !MyService.RUNNING;
     }
 
     private class CounterRunner implements Runnable {
@@ -107,6 +191,16 @@ public class MainActivity extends AuthenticatedActivity {
             }
         }
         setupGps();
+    }
+    private void checkReadSmsPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[] {Manifest.permission.RECEIVE_SMS},
+                        RECEIVE_SMS_REQUEST_CODE);
+                return;
+            }
+        }
     }
 
     @Override
@@ -232,6 +326,30 @@ public class MainActivity extends AuthenticatedActivity {
             // EASY WAY
             CustomNotification customNotification = new CustomNotification();
             customNotification.notify(MainActivity.this, "It is raining", notId);
+        }
+    }
+    private class ButtonBroadcast implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.setAction("MyAction");
+            intent.putExtra("message", "Hello World");
+            sendBroadcast(intent); // every app can listen
+        }
+    }
+    private class ButtonService implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            service();
+        }
+    }
+    private class ButtonServiceData implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(MainActivity.this, String.valueOf(serviceUi.getRandomNumber()),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 }
