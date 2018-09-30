@@ -2,7 +2,6 @@ package app.android.adam.androidapp;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.app.SearchManager;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -21,25 +20,20 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NotificationCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.List;
-
 import app.android.adam.androidapp.broadcast.MyReceiver;
-import app.android.adam.androidapp.contact.Contact;
 import app.android.adam.androidapp.interfaces.FragmentDataExtractor;
+import app.android.adam.androidapp.maps.MapActivity;
 import app.android.adam.androidapp.services.MyJobService;
 import app.android.adam.androidapp.services.MyService;
 import app.android.adam.androidapp.services.ServiceUi;
@@ -96,6 +90,7 @@ public class MainActivity extends AuthenticatedActivity {
         findViewById(R.id.mainSendBroadcast).setOnClickListener(new ButtonBroadcast());
         findViewById(R.id.mainToggleService).setOnClickListener(new ButtonService());
         findViewById(R.id.mainServiceData).setOnClickListener(new ButtonServiceData());
+        findViewById(R.id.mainShowMap).setOnClickListener(new ButtonShowMap());
 
         topTextGps = findViewById(R.id.mainTopTextGps);
         topTextGps.setOnClickListener(v -> {
@@ -114,6 +109,7 @@ public class MainActivity extends AuthenticatedActivity {
         });
 
         checkReadSmsPermissions();
+        checkGpsPermissions();
         setupBroadcast();
         jobService();
 
@@ -350,6 +346,14 @@ public class MainActivity extends AuthenticatedActivity {
         public void onClick(View v) {
             Toast.makeText(MainActivity.this, String.valueOf(serviceUi.getRandomNumber()),
                     Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class ButtonShowMap implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(MainActivity.this, MapActivity.class);
+            startActivity(intent);
         }
     }
 }
